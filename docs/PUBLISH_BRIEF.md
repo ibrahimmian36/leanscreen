@@ -1,4 +1,4 @@
-# Build prompt — extract the screen into `leanscreen`, ready for public release
+# Build prompt: extract the screen into `leanscreen`, ready for public release
 
 > This is the brief the extraction was executed against (2026-07-28). It is
 > written so a fresh Claude Code session could run it end to end; it also
@@ -13,7 +13,7 @@ The private repo stays the product; the public package is the funnel.
 ## What the product is
 
 `leanscreen`: one pip-installable package, one console script (`leanscreen`),
-serving the two MCP tools that already exist — `check_fast` (free,
+serving the two MCP tools that already exist: `check_fast` (free,
 deterministic: lints + vacuity + Lean elaboration) and `check_deep` (paid:
 dual-judge strict consensus + counterexample probe, on the user's own
 `ANTHROPIC_API_KEY`). Local-first, single-user, no hosting, no auth, no
@@ -21,7 +21,7 @@ telemetry.
 
 ## What moves, what stays private
 
-**Moves** (the screen subtree — it depends only on `httpx` at runtime):
+**Moves** (the screen subtree; it depends only on `httpx` at runtime):
 `llm.py`, `backtranslate.py` (judge prompts), `lints.py`, `quality.py`,
 `falsify.py`, `verify.py`, `lean_server.py`, `logging.py`, the single-pair
 `score_pair` core of `score_external.py`, and the MCP server. Unit tests for
@@ -41,10 +41,10 @@ produced them is the moat and never ships.
   server name stays `lean-faithfulness-screen`.
 - **License**: FSL-1.1-Apache-2.0 (revised from ELv2 on 2026-07-28 after
   license research, on Ibby's request). Why FSL won: (1) its Competing Use
-  clause covers "any other product or service we offer using the Software" —
+  clause covers "any other product or service we offer using the Software",
   protecting the certification/screening *service*, where ELv2 only blocks
   hosted versions of the software itself; (2) Permitted Purposes explicitly
-  allow internal use, non-commercial education, and research — the mathlib
+  allow internal use, non-commercial education, and research, the mathlib
   audience; (3) each version converts to Apache 2.0 (mathlib's license)
   after 2 years, the best community optics available, and a 2-year-old
   screener without current calibration is not a competitive threat; (4) it
@@ -53,7 +53,7 @@ produced them is the moat and never ships.
   anything heavy rides on it.)
 - **Env prefix**: `LEANSCREEN_` (`LEAN_PROJECT_PATH`, `LEAN_REPL_PATH`,
   `ANTHROPIC_MODEL`, `JUDGE_B_MODEL`, `MAX_TOKENS`, …). A fresh, slim
-  `Settings` — none of the platform's 50 knobs.
+  `Settings`, none of the platform's 50 knobs.
 - **Judge B is now a setting** (`LEANSCREEN_JUDGE_B_MODEL`, default
   `claude-fable-5` = the calibrated configuration) instead of a hard-coded
   constant; the locked-surface 32k max_tokens rule keys off the value.
@@ -67,7 +67,7 @@ produced them is the moat and never ships.
 
 ## Non-negotiable constraints (carried over verbatim)
 
-- The screen may only reject — never certify. `CALIBRATION_DISCLOSURE` ships
+- The screen may only reject, never certify. `CALIBRATION_DISCLOSURE` ships
   verbatim in every payload; both tool descriptions state passing is not
   certification (test-pinned).
 - Evidence tiers stay ranked, never flattened: counterexample >
@@ -75,7 +75,7 @@ produced them is the moat and never ships.
   bar).
 - Every flag is a candidate, not a verdict.
 - No secrets, no internal paths, no customer or reviewer names anywhere in
-  the public tree — audit before every push.
+  the public tree. Audit before every push.
 
 ## Quality gate
 
@@ -88,7 +88,7 @@ Strict mypy, zero errors, same bar as the private repo.
 ## Acceptance criteria
 
 1. `pip install -e .` in a fresh venv pulls only httpx, pydantic(-settings),
-   and mcp (plus their transitive deps) — none of the platform's heavy deps.
+   and mcp (plus their transitive deps), none of the platform's heavy deps.
 2. The full test suite passes; the MCP-server tests are the same ones that
    pass in the private repo, re-pointed.
 3. `leanscreen` starts over stdio with no Lean project and no API key and
@@ -102,7 +102,7 @@ Strict mypy, zero errors, same bar as the private repo.
 ## Steps reserved for Ibby (do not automate)
 
 1. Confirm the license choice and the public contact address.
-2. `gh repo create` (public) + first push — publishing is a send.
+2. `gh repo create` (public) + first push. Publishing is a send.
 3. Any PyPI upload, registry listing, or announcement post (10am rule).
 
 ---

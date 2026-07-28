@@ -1,6 +1,6 @@
 ---
 name: screen
-description: Screen informal↔Lean 4 statement pairs for faithfulness defects. Use whenever writing, editing, translating, or reviewing Lean 4 theorem or definition statements that are meant to formalize informal mathematics — after drafting a statement, before committing formalizations, when auditing a benchmark file, or when the user asks to check whether a Lean statement says what the mathematics says.
+description: Screen informal↔Lean 4 statement pairs for faithfulness defects. Use whenever writing, editing, translating, or reviewing Lean 4 theorem or definition statements that are meant to formalize informal mathematics: after drafting a statement, before committing formalizations, when auditing a benchmark file, or when the user asks to check whether a Lean statement says what the mathematics says.
 ---
 
 # Screening Lean statements for faithfulness
@@ -12,7 +12,7 @@ habitually, and to report what they say honestly.
 
 ## The invariant, verbatim
 
-A pass is "no defect found by this harness" — **never** a certification of
+A pass is "no defect found by this harness". It is never a certification of
 faithfulness. Automated screeners may only reject. Only a human certifies.
 Never tell the user a statement "is faithful," "is correct," or "passed
 verification" because it passed screening. Say what was checked and what was
@@ -40,13 +40,13 @@ loop it silently.** Report the actual spend from `actual_cost_usd`.
 
 Rank evidence by tier, strongest first: **counterexample** > **deterministic
 lint/vacuity** > **two-judge consensus** > single-judge (below the reporting
-bar — mention it only as "one judge dissented," never as a finding).
+bar; mention it only as "one judge dissented," never as a finding).
 
 Relay the calibration honestly when summarizing: measured against 886 frozen
 human verdicts, human-rejected pairs still passed the full screen 17.0% of
 the time for theorems and 35.6% for definitions, and human-certified pairs
-were flagged 15–18% of the time. The counterexample probe can confabulate —
-check its counterexamples by hand before repeating them as fact.
+were flagged 15–18% of the time. The counterexample probe can confabulate.
+Check its counterexamples by hand before repeating them as fact.
 
 ## Explicit invocation
 
