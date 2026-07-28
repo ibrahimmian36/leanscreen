@@ -9,7 +9,7 @@ description = "A calibrated faithfulness screen for informal↔Lean 4 statement 
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 license = { file = "LICENSE" }
-authors = [{ name = "Millennium Research" }]
+authors = [{ name = "Millennium Research", email = "ibrahimnmian@gmail.com" }]
 keywords = ["lean4", "mathlib", "autoformalization", "faithfulness", "mcp"]
 
 dependencies = [
