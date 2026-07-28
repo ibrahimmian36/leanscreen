@@ -1,0 +1,96 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "leanscreen"
+version = "0.1.0"
+description = "A calibrated faithfulness screen for informal↔Lean 4 statement pairs, served over MCP. Screens only — never certifies."
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { file = "LICENSE" }
+authors = [{ name = "Millennium Research" }]
+keywords = ["lean4", "mathlib", "autoformalization", "faithfulness", "mcp"]
+
+dependencies = [
+    "httpx>=0.27.0",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.3.0",
+    # Pinned below 2.0: the SDK renamed FastMCP -> MCPServer in 2.0 and this
+    # package's verified surface (parity + stdio smokes) ran on 1.x. Migrate
+    # deliberately, with the smokes rerun, not via a resolver surprise.
+    "mcp>=1.28.0,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.10.0",
+    "ruff>=0.5.0",
+    "pytest>=8.2.0",
+]
+
+[project.scripts]
+leanscreen = "leanscreen.server:main"
+
+[project.urls]
+Homepage = "https://millenniumresearch.ai/leanscreen"
+Repository = "https://github.com/ibrahimmian36/leanscreen"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/leanscreen"]
+
+# ---------------------------------------------------------------------------
+# ruff
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "N",        # pep8-naming
+    "UP",       # pyupgrade
+    "B",        # flake8-bugbear
+    "A",        # flake8-builtins
+    "C4",       # comprehensions
+    "SIM",      # simplify
+    "PTH",      # use pathlib
+    "RUF",      # ruff-specific
+]
+ignore = [
+    "A003",  # class attribute shadowing a builtin is fine
+    # This is a Lean/math codebase: ℕ, ∀, ∃, ∣ etc. are legitimate, not typos.
+    "RUF001",  # ambiguous unicode char in string
+    "RUF002",  # ambiguous unicode char in docstring
+    "RUF003",  # ambiguous unicode char in comment
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["N802", "N803", "E501"]  # test naming + long-literal latitude
+
+[tool.ruff.lint.isort]
+known-first-party = ["leanscreen"]
+
+# ---------------------------------------------------------------------------
+# mypy: strict. Zero errors is a build requirement.
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+mypy_path = "src"
+packages = ["leanscreen"]
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
