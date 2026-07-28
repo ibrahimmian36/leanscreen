@@ -38,7 +38,7 @@ the declaration head when omitted). Responses rank their evidence —
 ## Install
 
 ```bash
-pip install git+https://github.com/ibrahimmian36/leanscreen
+pip install leanscreen
 ```
 
 Requires Python ≥3.12. Runtime dependencies: `httpx`, `pydantic`,
