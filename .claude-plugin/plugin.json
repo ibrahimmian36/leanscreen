@@ -2,7 +2,7 @@
   "name": "leanscreen",
   "displayName": "leanscreen",
   "version": "0.1.0",
-  "description": "Faithfulness screening for Lean 4 statements while you draft them. Screens only — never certifies.",
+  "description": "Faithfulness screening for Lean 4 statements while you draft them. Screens only, never certifies.",
   "author": {
     "name": "Millennium Research",
     "email": "ibrahimnmian@gmail.com",
