@@ -123,7 +123,8 @@ before building on it commercially.
 
 Extracted from Millennium Research's private formalization platform
 (2026-07-28); the detector stack, judge prompts, and calibration figures are
-the ones used in our published benchmark audits (miniF2F, ProofNet#,
-PutnamBench, ProofNetVerif, CLEVER). The calibration *data* is not included.
+the ones behind our benchmark audits — the miniF2F and ProofNet# filings are
+public, and the PutnamBench, ProofNetVerif, and CLEVER audits have been
+shared with their maintainers. The calibration *data* is not included.
 
 Project page: [millenniumresearch.ai/leanscreen](https://millenniumresearch.ai/leanscreen)
