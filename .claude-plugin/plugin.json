@@ -1,0 +1,20 @@
+{
+  "name": "leanscreen",
+  "displayName": "leanscreen",
+  "version": "0.1.0",
+  "description": "Faithfulness screening for Lean 4 statements while you draft them. Screens only — never certifies.",
+  "author": {
+    "name": "Millennium Research",
+    "email": "ibrahimnmian@gmail.com",
+    "url": "https://millenniumresearch.ai"
+  },
+  "homepage": "https://millenniumresearch.ai/leanscreen",
+  "repository": "https://github.com/ibrahimmian36/leanscreen",
+  "license": "FSL-1.1-Apache-2.0",
+  "keywords": ["lean4", "mathlib", "autoformalization", "faithfulness", "mcp", "formal-verification"],
+  "mcpServers": {
+    "leanscreen": {
+      "command": "leanscreen"
+    }
+  }
+}
