@@ -7,7 +7,7 @@ name = "leanscreen"
 version = "0.1.0"
 description = "A calibrated faithfulness screen for informal↔Lean 4 statement pairs, served over MCP. Screens only, never certifies."
 readme = "README.md"
-requires-python = ">=3.12,<3.14"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 authors = [{ name = "Millennium Research", email = "ibrahimnmian@gmail.com" }]
 keywords = ["lean4", "mathlib", "autoformalization", "faithfulness", "mcp"]
