@@ -1,0 +1,22 @@
+{
+  "name": "millennium-research",
+  "description": "Millennium Research tooling for formal mathematics",
+  "owner": {
+    "name": "Millennium Research",
+    "email": "ibrahimnmian@gmail.com",
+    "url": "https://millenniumresearch.ai"
+  },
+  "plugins": [
+    {
+      "name": "leanscreen",
+      "source": "./",
+      "description": "Faithfulness screening for Lean 4 statements while you draft them. Screens only — never certifies.",
+      "version": "0.1.0",
+      "category": "verification",
+      "keywords": ["lean4", "mathlib", "autoformalization", "faithfulness"],
+      "homepage": "https://millenniumresearch.ai/leanscreen",
+      "repository": "https://github.com/ibrahimmian36/leanscreen",
+      "license": "FSL-1.1-Apache-2.0"
+    }
+  ]
+}

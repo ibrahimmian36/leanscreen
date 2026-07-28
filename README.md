@@ -44,6 +44,30 @@ pip install leanscreen
 Requires Python ≥3.12. Runtime dependencies: `httpx`, `pydantic`,
 `pydantic-settings`, `mcp` — nothing else.
 
+## Claude Code plugin
+
+This repo is also a Claude Code plugin (and its own marketplace). Beyond
+registering the MCP server for you, the plugin ships a skill that makes
+Claude screen habitually: `check_fast` after drafting any Lean statement,
+`check_deep` offered (with its cost stated) before formalizations ship, and
+results always reported as screening — never certification.
+
+```bash
+pip install leanscreen
+```
+
+then inside Claude Code:
+
+```text
+/plugin marketplace add ibrahimmian36/leanscreen
+/plugin install leanscreen@millennium-research
+```
+
+`/leanscreen:screen <file>` runs a fast pass over every pair in a file
+(`--deep` opts into the paid judges after a cost confirmation). Uninstall
+with `/plugin uninstall leanscreen`. The `pip install` still matters — the
+plugin launches the `leanscreen` command from your PATH.
+
 ## Lean setup (optional but recommended)
 
 Without a Lean project, the server still runs — `check_fast` does lints +
