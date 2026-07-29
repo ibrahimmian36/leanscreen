@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "leanscreen"
-version = "0.1.0"
-description = "A calibrated faithfulness screen for informal↔Lean 4 statement pairs, served over MCP. Screens only, never certifies."
+version = "0.1.1"
+description = "A calibrated faithfulness screen for informal↔Lean 4 statement pairs, on the command line and over MCP. Screens only, never certifies."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }

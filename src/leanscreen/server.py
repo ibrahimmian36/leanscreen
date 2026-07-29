@@ -23,6 +23,7 @@ vacuity results immediately with a "still warming" note instead of blocking;
 from __future__ import annotations
 
 import hashlib
+import sys
 import threading
 import time
 from collections.abc import Callable
@@ -101,6 +102,28 @@ class LeanState:
     error: str = ""
     ready: threading.Event = field(default_factory=threading.Event)
     started: float = field(default_factory=time.monotonic)
+
+
+def warm_verifier(lean: LeanState, verifier: Verifier) -> None:
+    """Run the one-statement warm-up and mark ``lean`` ready, pass or fail.
+
+    Shared by the MCP server (called on a background thread so startup does
+    not block on the ~100s mathlib import) and the one-shot CLI (called
+    synchronously, so the first check never races the warm-up).
+    """
+    try:
+        result = verifier.verify(_WARM_STATEMENT)
+    except VerifierError as exc:
+        lean.error = f"verifier failed to warm: {exc}"
+    else:
+        if result.status is VerifierStatus.VALID:
+            lean.verifier = verifier
+            _log.info("lean REPL warm in %.0fs", time.monotonic() - lean.started)
+        else:
+            lean.error = f"warm-up check returned {result.status.value}: {result.output[:200]}"
+    if lean.error:
+        _log.warning("lean elaboration disabled: %s", lean.error)
+    lean.ready.set()
 
 
 @dataclass(slots=True)
@@ -259,25 +282,9 @@ class ScreenerRuntime:
             lean.ready.set()
             _log.warning("lean elaboration disabled: %s", exc)
         else:
-
-            def _warm() -> None:
-                try:
-                    result = verifier.verify(_WARM_STATEMENT)
-                except VerifierError as exc:
-                    lean.error = f"verifier failed to warm: {exc}"
-                else:
-                    if result.status is VerifierStatus.VALID:
-                        lean.verifier = verifier
-                        _log.info("lean REPL warm in %.0fs", time.monotonic() - lean.started)
-                    else:
-                        lean.error = (
-                            f"warm-up check returned {result.status.value}: {result.output[:200]}"
-                        )
-                if lean.error:
-                    _log.warning("lean elaboration disabled: %s", lean.error)
-                lean.ready.set()
-
-            threading.Thread(target=_warm, daemon=True, name="lean-warm").start()
+            threading.Thread(
+                target=warm_verifier, args=(lean, verifier), daemon=True, name="lean-warm"
+            ).start()
         return cls(settings, lean, lambda: _build_deep_stack(settings))
 
     def check_fast(self, informal: str, lean: str, kind: str | None = None) -> dict[str, Any]:
@@ -410,12 +417,21 @@ def check_deep(informal: str, lean: str, kind: str | None = None) -> dict[str, A
 
 
 def main() -> None:
-    """Entry point for the ``leanscreen`` console script (stdio transport).
+    """Entry point for the ``leanscreen`` console script.
 
-    Logging goes to stderr (stdout is the MCP protocol channel). The runtime
-    is built eagerly so the REPL starts importing mathlib NOW, not on the
-    user's first call.
+    Bare ``leanscreen`` (no arguments) runs the MCP stdio server — the
+    invocation every MCP client config uses, so it must stay argument-free.
+    Any argument (``check ...``, ``--help``) dispatches to the one-shot CLI
+    in :mod:`leanscreen.cli` instead.
+
+    For the server: logging goes to stderr (stdout is the MCP protocol
+    channel), and the runtime is built eagerly so the REPL starts importing
+    mathlib NOW, not on the user's first call.
     """
+    if len(sys.argv) > 1:
+        from leanscreen.cli import main as cli_main  # deferred: avoids a cycle
+
+        raise SystemExit(cli_main(sys.argv[1:]))
     configure_logging()
     _runtime()
     _MCP.run()

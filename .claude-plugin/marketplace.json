@@ -11,7 +11,7 @@
       "name": "leanscreen",
       "source": "./",
       "description": "Faithfulness screening for Lean 4 statements while you draft them. Screens only, never certifies.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "category": "verification",
       "keywords": ["lean4", "mathlib", "autoformalization", "faithfulness"],
       "homepage": "https://millenniumresearch.ai/leanscreen",
