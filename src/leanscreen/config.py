@@ -41,8 +41,8 @@ class Settings(BaseSettings):
     anthropic_base_url: str = Field(default="https://api.anthropic.com/v1/messages")
     anthropic_version: str = Field(default="2023-06-01")
     anthropic_model: str = Field(
-        default="claude-opus-4-8",
-        description="Model for judge A and the counterexample probe (the calibrated default).",
+        default="claude-opus-5",
+        description="Model for judge A and the counterexample probe.",
     )
     judge_b_model: str = Field(
         default="claude-fable-5",

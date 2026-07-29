@@ -137,7 +137,7 @@ Environment variables (or a `.env` in the working directory), all
 | `LEANSCREEN_LEAN_PROJECT_PATH` | unset | Lean 4 + mathlib project (elaboration off when unset) |
 | `LEANSCREEN_LEAN_REPL_PATH` | unset | community REPL binary; without it every check pays a full `lake env lean` |
 | `LEANSCREEN_LEAN_TIMEOUT_SECONDS` | `180` | per-statement Lean budget |
-| `LEANSCREEN_ANTHROPIC_MODEL` | `claude-opus-4-8` | judge A + probe (the calibrated default) |
+| `LEANSCREEN_ANTHROPIC_MODEL` | `claude-opus-5` | judge A + probe |
 | `LEANSCREEN_JUDGE_B_MODEL` | `claude-fable-5` | checklist judge (calibrated default; locked-surface models get a 32k token budget automatically) |
 | `LEANSCREEN_MAX_TOKENS` | `4096` | judge A response budget |
 | `ANTHROPIC_API_KEY` | unset | needed for `check_deep` only |
@@ -169,7 +169,10 @@ corpus. Under strict two-judge consensus, human-rejected pairs still passed
 pairs were flagged 15–18% of the time. Both judges are Anthropic-family
 models, so correlated blind spots cannot be ruled out. The counterexample
 probe confabulates: on one PutnamBench sample its counterexamples were wrong
-4 times out of 5. Treat every flag as a candidate for human confirmation and
+4 times out of 5. That calibration ran judge A on claude-opus-4-8; the
+shipped default is now claude-opus-5, and the recalibration against the
+frozen verdicts has not been run yet. Treat every flag as a candidate for
+human confirmation and
 every pass as "nothing found", never "faithful."
 
 Human certification, meaning an expert reviewer confirming that the Lean
