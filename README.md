@@ -1,8 +1,21 @@
 # leanscreen
 
-A calibrated faithfulness screen for informal↔Lean 4 statement pairs, served
-over [MCP](https://modelcontextprotocol.io) so Claude (Code, Desktop, or any
-MCP client) can check statements while you draft them.
+A calibrated faithfulness screen for informal↔Lean 4 statement pairs, on the
+command line and over [MCP](https://modelcontextprotocol.io), so you or
+Claude (Code, Desktop, or any MCP client) can check statements while they
+are being drafted.
+
+```console
+$ leanscreen check Demo.lean
+exists_perfect_number: REJECTED  lean=valid_in_our_env  flags=deterministic-vacuous:reflexive-goal [deterministic]
+even_add_even: no defect found  lean=valid_in_our_env
+screened 2 pair(s): 1 rejected, 0 needs human review, 1 passed screening (no defect found, not a certification)
+```
+
+That first theorem compiles and is even provable. Its docstring says "there
+exists a natural number equal to the sum of its proper divisors"; its
+statement says `∃ n : ℕ, n = n`. The compiler has no objection. That gap is
+what this tool screens for.
 
 The one thing to understand before using it: this screen may only *reject*.
 `passed_screening` means "no defect found by this harness". It is not a
@@ -43,6 +56,36 @@ pip install leanscreen
 
 Requires Python ≥3.12. Runtime dependencies are `httpx`, `pydantic`,
 `pydantic-settings`, and `mcp`. Nothing else.
+
+## Command line
+
+`leanscreen check` screens once and exits; the bare `leanscreen` command
+still runs the MCP server. Three input shapes:
+
+```bash
+leanscreen check --informal "The sum of two even integers is even." --lean "theorem t (a b : Int) (ha : Even a) (hb : Even b) : Even (a + b)"
+```
+
+```bash
+leanscreen check pairs.jsonl
+```
+
+```bash
+leanscreen check MyFile.lean
+```
+
+The `.lean` form pairs each `theorem`/`lemma`/`def` with the `/-- ... -/`
+doc comment above it and screens every documented declaration in the file;
+undocumented declarations are skipped with a note. The default is the free
+fast screen. `--deep` adds the judges and probe on your own
+`ANTHROPIC_API_KEY`, with `--budget USD` as a hard stop. `--json` writes
+one full payload object per line to stdout, everything else to stderr.
+
+Exit codes are a CI contract: `0` means nothing was rejected (no defect
+found, which is not a certification), `1` means at least one pair was
+rejected on reject-tier evidence, `2` means a usage or configuration
+error. A formalization repo can run `leanscreen check src/*.lean` in CI
+and fail the build on unscreened defects.
 
 ## Claude Code plugin
 
