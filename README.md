@@ -19,9 +19,7 @@ what this tool screens for.
 
 One rule governs everything below: this screen may only *reject*.
 `passed_screening` means "no defect found by this harness", never
-"faithful" — and unlike most screening tools, leanscreen ships its own
-measured error rates, in every response and in
-[What a verdict is worth](#what-a-verdict-is-worth) below.
+"faithful" — see [Calibration](#calibration).
 
 ## Two tools
 
@@ -158,26 +156,18 @@ Claude Code (`.mcp.json` in your project) or Claude Desktop
 }
 ```
 
-## What a verdict is worth
+## Calibration
 
-Most screening tools ask to be trusted. This one is calibrated, and tells
-you exactly what a verdict is worth. The judge configuration was measured
-2026-07-15 against 886 frozen human verdicts (595 faithful / 291
-unfaithful) from a production research-math corpus. Under strict two-judge
-consensus, human-rejected pairs still passed 17.0% (theorems) / 35.6%
-(definitions) of the time, and human-certified pairs were flagged 15–18% of
-the time. Both judges are Anthropic-family
-models, so correlated blind spots cannot be ruled out. The counterexample
-probe confabulates: on one PutnamBench sample its counterexamples were wrong
-4 times out of 5. That calibration ran judge A on claude-opus-4-8; the
-shipped default is now claude-opus-5, and the recalibration against the
-frozen verdicts has not been run yet. Treat every flag as a candidate for
-human confirmation and
-every pass as "nothing found", never "faithful."
+Measured against 886 frozen human verdicts (2026-07-15): human-rejected
+pairs still passed the full screen 17.0% of the time for theorems, 35.6%
+for definitions. Every response carries the complete disclosure; treat
+every flag as a candidate and every pass as "nothing found", never
+"faithful". The shipped judge default (`claude-opus-5`) postdates this
+calibration; a recalibration has not been run yet.
 
-Human certification, meaning an expert reviewer confirming that the Lean
-means the informal statement, is what this screen deliberately does not
-automate. We offer it as a service: contact ibrahimnmian@gmail.com.
+Human certification — an expert reviewer confirming the Lean means the
+informal statement — is the service this screen deliberately does not
+automate: contact ibrahimnmian@gmail.com.
 
 ## License
 
