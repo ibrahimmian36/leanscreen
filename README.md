@@ -17,13 +17,11 @@ exists a natural number equal to the sum of its proper divisors"; its
 statement says `∃ n : ℕ, n = n`. The compiler has no objection. That gap is
 what this tool screens for.
 
-The one thing to understand before using it: this screen may only *reject*.
-`passed_screening` means "no defect found by this harness". It is not a
-certification of faithfulness. Measured against 886 frozen human verdicts,
-statements a human reviewer had rejected still passed the full screen 17.0%
-of the time for theorems and 35.6% for definitions; statements a human had
-certified faithful were flagged 15–18% of the time. Every response carries
-this calibration verbatim.
+One rule governs everything below: this screen may only *reject*.
+`passed_screening` means "no defect found by this harness", never
+"faithful" — and unlike most screening tools, leanscreen ships its own
+measured error rates, in every response and in
+[What a verdict is worth](#what-a-verdict-is-worth) below.
 
 ## Two tools
 
@@ -160,13 +158,15 @@ Claude Code (`.mcp.json` in your project) or Claude Desktop
 }
 ```
 
-## What this does not guarantee
+## What a verdict is worth
 
-The judge configuration was calibrated 2026-07-15 against 886 frozen human
-verdicts (595 faithful / 291 unfaithful) from a production research-math
-corpus. Under strict two-judge consensus, human-rejected pairs still passed
-17.0% (theorems) / 35.6% (definitions) of the time, and human-certified
-pairs were flagged 15–18% of the time. Both judges are Anthropic-family
+Most screening tools ask to be trusted. This one is calibrated, and tells
+you exactly what a verdict is worth. The judge configuration was measured
+2026-07-15 against 886 frozen human verdicts (595 faithful / 291
+unfaithful) from a production research-math corpus. Under strict two-judge
+consensus, human-rejected pairs still passed 17.0% (theorems) / 35.6%
+(definitions) of the time, and human-certified pairs were flagged 15–18% of
+the time. Both judges are Anthropic-family
 models, so correlated blind spots cannot be ruled out. The counterexample
 probe confabulates: on one PutnamBench sample its counterexamples were wrong
 4 times out of 5. That calibration ran judge A on claude-opus-4-8; the
