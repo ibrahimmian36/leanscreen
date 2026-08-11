@@ -19,7 +19,7 @@ what this tool screens for.
 
 One rule governs everything below: this screen may only *reject*.
 `passed_screening` means "no defect found by this harness", never
-"faithful" — see [Calibration](#calibration).
+"faithful".
 
 ## Two tools
 
@@ -133,7 +133,7 @@ Environment variables (or a `.env` in the working directory), all
 | `LEANSCREEN_LEAN_PROJECT_PATH` | unset | Lean 4 + mathlib project (elaboration off when unset) |
 | `LEANSCREEN_LEAN_REPL_PATH` | unset | community REPL binary; without it every check pays a full `lake env lean` |
 | `LEANSCREEN_LEAN_TIMEOUT_SECONDS` | `180` | per-statement Lean budget |
-| `LEANSCREEN_ANTHROPIC_MODEL` | `claude-opus-5` | judge A + probe |
+| `LEANSCREEN_ANTHROPIC_MODEL` | `claude-opus-5` | judge A + probe (default postdates the 2026-07-15 calibration run) |
 | `LEANSCREEN_JUDGE_B_MODEL` | `claude-fable-5` | checklist judge (calibrated default; locked-surface models get a 32k token budget automatically) |
 | `LEANSCREEN_MAX_TOKENS` | `4096` | judge A response budget |
 | `ANTHROPIC_API_KEY` | unset | needed for `check_deep` only |
@@ -156,19 +156,6 @@ Claude Code (`.mcp.json` in your project) or Claude Desktop
 }
 ```
 
-## Calibration
-
-Measured against 886 frozen human verdicts (2026-07-15): human-rejected
-pairs still passed the full screen 17.0% of the time for theorems, 35.6%
-for definitions. Every response carries the complete disclosure; treat
-every flag as a candidate and every pass as "nothing found", never
-"faithful". The shipped judge default (`claude-opus-5`) postdates this
-calibration; a recalibration has not been run yet.
-
-Human certification — an expert reviewer confirming the Lean means the
-informal statement — is the service this screen deliberately does not
-automate: contact ibrahimnmian@gmail.com.
-
 ## License
 
 [FSL-1.1-Apache-2.0](LICENSE) (the Functional Source License): free to use,
@@ -186,5 +173,9 @@ Extracted from Millennium Research's private formalization platform
 the ones behind our benchmark audits. The miniF2F and ProofNet# filings are
 public, and the PutnamBench, ProofNetVerif, and CLEVER audits have been
 shared with their maintainers. The calibration *data* is not included.
+
+Human certification — an expert reviewer confirming the Lean means the
+informal statement — is available as a service: contact
+ibrahimnmian@gmail.com.
 
 Project page: [millenniumresearch.ai/leanscreen](https://millenniumresearch.ai/leanscreen)
