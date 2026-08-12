@@ -28,3 +28,18 @@ jobs:
         run: mypy
       - name: Tests
         run: pytest -q
+
+  # The matrix resolves mcp 2.x; this leg guards the 1.x compatibility path.
+  test-mcp1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install with mcp 1.x
+        run: |
+          pip install -e ".[dev]"
+          pip install "mcp>=1.28,<2"
+      - name: Tests
+        run: pytest -q

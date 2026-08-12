@@ -16,10 +16,10 @@ dependencies = [
     "httpx>=0.27.0",
     "pydantic>=2.7.0",
     "pydantic-settings>=2.3.0",
-    # Pinned below 2.0: the SDK renamed FastMCP -> MCPServer in 2.0 and this
-    # package's verified surface (parity + stdio smokes) ran on 1.x. Migrate
-    # deliberately, with the smokes rerun, not via a resolver surprise.
-    "mcp>=1.28.0,<2",
+    # Both SDK majors are supported: 2.0 renamed FastMCP -> MCPServer and
+    # server.py aliases whichever is installed. CI runs the suite against
+    # both; the stdio smokes were rerun on each at migration (2026-08-12).
+    "mcp>=1.28.0",
 ]
 
 [project.optional-dependencies]

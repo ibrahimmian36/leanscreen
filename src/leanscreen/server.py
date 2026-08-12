@@ -28,10 +28,20 @@ import threading
 import time
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
+else:
+    # The SDK renamed the high-level server in 2.0 (FastMCP -> MCPServer);
+    # the constructor, tool decorator, and stdio run are call-compatible for
+    # everything this module uses, so one alias supports both majors.
+    try:
+        from mcp.server.mcpserver import MCPServer
+    except ImportError:  # mcp 1.x
+        from mcp.server.fastmcp import FastMCP as MCPServer
 
 from leanscreen.backtranslate import BackTranslator, ReviewAid
 from leanscreen.config import Settings
@@ -347,7 +357,7 @@ class ScreenerRuntime:
         return _payload(score, checks_skipped=skipped, actual_cost_usd=cost)
 
 
-_MCP = FastMCP(
+_MCP = MCPServer(
     "lean-faithfulness-screen",
     instructions=(
         "Faithfulness screen for informal↔Lean 4 statement pairs. check_fast "
