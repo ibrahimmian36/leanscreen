@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -177,6 +178,10 @@ def test_send_wraps_broken_pipe_as_verifier_error() -> None:
         proc.send({"cmd": "x"}, timeout=1.0)
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="process groups are POSIX-only; Windows uses plain Popen.kill()",
+)
 def test_kill_takes_down_the_whole_process_group(tmp_path: Path) -> None:
     """killpg semantics: the repl is lake's CHILD — killing only the wrapper
     orphaned it with its mathlib heap (the historic 25-minute stalls)."""
