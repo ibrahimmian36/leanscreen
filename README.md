@@ -1,5 +1,7 @@
 # leanscreen
 
+[![ci](https://github.com/ibrahimmian36/leanscreen/actions/workflows/ci.yml/badge.svg)](https://github.com/ibrahimmian36/leanscreen/actions/workflows/ci.yml)
+
 A calibrated faithfulness screen for informal↔Lean 4 statement pairs, on the
 command line and over [MCP](https://modelcontextprotocol.io), so you or
 Claude (Code, Desktop, or any MCP client) can check statements while they
