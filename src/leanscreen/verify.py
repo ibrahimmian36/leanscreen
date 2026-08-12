@@ -17,6 +17,7 @@ import os
 import re
 import signal
 import subprocess
+import sys
 import time
 import uuid
 from collections.abc import Callable
@@ -320,13 +321,16 @@ class LeanVerifier:
             try:
                 stdout, stderr = proc.communicate(timeout=self._timeout)
             except subprocess.TimeoutExpired:
-                try:
-                    pgid = os.getpgid(proc.pid)
-                    if pgid == os.getpgid(0):
-                        raise ProcessLookupError  # shared group: killpg = suicide
-                    os.killpg(pgid, signal.SIGKILL)
-                except (ProcessLookupError, PermissionError, OSError):
-                    proc.kill()  # group gone/shared: fall back to the wrapper
+                if sys.platform == "win32":
+                    proc.kill()  # no process groups on Windows
+                else:
+                    try:
+                        pgid = os.getpgid(proc.pid)
+                        if pgid == os.getpgid(0):
+                            raise ProcessLookupError  # shared group: killpg = suicide
+                        os.killpg(pgid, signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError, OSError):
+                        proc.kill()  # group gone/shared: fall back to the wrapper
                 proc.wait(timeout=10)
                 return RunnerOutput(output="<timeout>", timed_out=True)
             return RunnerOutput(

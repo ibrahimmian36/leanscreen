@@ -18,6 +18,7 @@ import os
 import queue
 import signal
 import subprocess
+import sys
 import threading
 import time
 from collections.abc import Callable
@@ -176,16 +177,19 @@ class ReplProcess:
             # the lake wrapper orphans the repl with its mathlib heap.
             # AttributeError/TypeError: test seams inject fake procs without a
             # real pid — fall back to their plain kill() like the group cases.
-            try:
-                pgid = os.getpgid(self._proc.pid)
-                if pgid == os.getpgid(0):
-                    # The child shares OUR process group (spawned without
-                    # start_new_session, e.g. by a test harness): killpg here
-                    # would SIGKILL the calling process too. Plain kill only.
-                    raise ProcessLookupError
-                os.killpg(pgid, signal.SIGKILL)
-            except (ProcessLookupError, PermissionError, OSError, AttributeError, TypeError):
-                self._proc.kill()  # group gone/foreign/shared: fall back
+            if sys.platform == "win32":
+                self._proc.kill()  # no process groups on Windows
+            else:
+                try:
+                    pgid = os.getpgid(self._proc.pid)
+                    if pgid == os.getpgid(0):
+                        # The child shares OUR process group (spawned without
+                        # start_new_session, e.g. by a test harness): killpg here
+                        # would SIGKILL the calling process too. Plain kill only.
+                        raise ProcessLookupError
+                    os.killpg(pgid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError, OSError, AttributeError, TypeError):
+                    self._proc.kill()  # group gone/foreign/shared: fall back
             self._proc.wait(timeout=10)
         self._proc = None
         self._env_id = None
