@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from leanscreen.backtranslate import (
     BackTranslator,
     build_user_prompt,
@@ -53,6 +55,94 @@ def test_parse_unknown_verdict_degrades_to_unclear() -> None:
     review = parse_review("the model rambled without the format")
     assert review.verdict == "unclear"
     assert review.back_english  # falls back to the raw text
+
+
+@pytest.mark.parametrize(
+    ("response", "expected"),
+    [
+        pytest.param("VERDICT: FAITHFUL", "faithful", id="faithful"),
+        pytest.param("VERDICT: MISMATCH", "mismatch", id="mismatch"),
+        pytest.param("VERDICT: UNCLEAR", "unclear", id="unclear"),
+        pytest.param(" \tVeRdIcT:\t fAiThFuL \t", "faithful", id="case-whitespace"),
+        pytest.param("VERDICT: MISMATCH\r\nISSUES: Missing condition.", "mismatch", id="crlf"),
+        pytest.param("VERDICT: UNFAITHFUL", "unclear", id="token-prefix"),
+        pytest.param("VERDICT: FAITHFULNESS", "unclear", id="token-suffix"),
+        pytest.param("VERDICT: MISMATCH_extra", "unclear", id="token-underscore"),
+        pytest.param("VERDICT: FAITHFUL2", "unclear", id="token-digit"),
+        pytest.param("VERDICT: FAITHFUL/MISMATCH", "unclear", id="token-alternatives"),
+        pytest.param("VERDICT: FAITHFUL (or MISMATCH)", "unclear", id="trailing-prose"),
+        pytest.param("VERDICT: UNKNOWN", "unclear", id="unknown"),
+        pytest.param("BACK-TRANSLATION: A predicate.\nISSUES: None.", "unclear", id="missing"),
+        pytest.param(
+            'BACK-TRANSLATION: Contains "VERDICT: FAITHFUL".', "unclear", id="inline-only"
+        ),
+        pytest.param("FAITHFUL | MISMATCH | UNCLEAR", "unclear", id="bare-menu"),
+        pytest.param("VERDICT: FAITHFUL | MISMATCH | UNCLEAR", "unclear", id="verdict-menu"),
+        pytest.param("VERDICT: FAITHFUL\n verdict: faithful", "faithful", id="same-duplicates"),
+        pytest.param(
+            "VERDICT: FAITHFUL\nVERDICT: MISMATCH", "unclear", id="conflicting-duplicates"
+        ),
+        pytest.param("VERDICT: MISMATCH\nVERDICT: FAITHFUL", "unclear", id="reversed-conflict"),
+        pytest.param("VERDICT: FAITHFUL\nVERDICT: UNKNOWN", "unclear", id="malformed-duplicate"),
+        pytest.param("VERDICT: UNKNOWN\nVERDICT: FAITHFUL", "unclear", id="malformed-first"),
+        pytest.param("VERDICT:\nVERDICT: FAITHFUL", "unclear", id="empty-duplicate"),
+        pytest.param("VERDICT:\nFAITHFUL", "unclear", id="value-on-next-line"),
+    ],
+)
+def test_parse_verdict_fields(response: str, expected: str) -> None:
+    assert parse_review(response).verdict == expected
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        "FAITHFUL\rVERDICT: MISMATCH",
+        "MISMATCH\rVERDICT: FAITHFUL",
+        "FAITHFUL\rmalformed trailing content",
+        "MISMATCH\rVERDICT: UNKNOWN",
+    ],
+)
+def test_parse_bare_carriage_returns_degrade_to_unclear(fields: str) -> None:
+    response = f"BACK-TRANSLATION: x.\nVERDICT: {fields}\nISSUES: conflicting verdicts."
+    review = parse_review(response)
+    assert review.verdict == "unclear"
+    assert review.back_english == "x."
+    assert review.issues == "conflicting verdicts."
+    assert review.raw == response
+
+
+@pytest.mark.parametrize("newline", ["\n", "\r\n"], ids=["lf", "crlf"])
+@pytest.mark.parametrize("verdict", ["FAITHFUL", "MISMATCH", "UNCLEAR"])
+def test_parse_supported_newlines_preserve_response(newline: str, verdict: str) -> None:
+    response = newline.join(["BACK-TRANSLATION: x.", f"VERDICT: {verdict}", "ISSUES: None."])
+    review = parse_review(response)
+    assert review.verdict == verdict.lower()
+    assert review.back_english == "x."
+    assert review.issues == "None."
+    assert review.raw == response
+
+
+@pytest.mark.parametrize(
+    ("quoted", "actual", "issues"),
+    [
+        ("FAITHFUL", "MISMATCH", "The formalization drops the nonempty-string requirement."),
+        ("MISMATCH", "FAITHFUL", "None."),
+    ],
+)
+@pytest.mark.parametrize("newline", ["\n", "\r\n"], ids=["lf", "crlf"])
+def test_parse_ignores_inline_verdicts(quoted: str, actual: str, issues: str, newline: str) -> None:
+    # Constructed regressions, not responses observed in production.
+    back = f'The predicate accepts a string containing "VERDICT: {quoted}".'
+    back += newline + "The rendering continues on another line."
+    issues += newline + f'The quoted text "VERDICT: {quoted}" is part of the predicate.'
+    response = newline.join(
+        [f"BACK-TRANSLATION: {back}", f"VERDICT: {actual}", f"ISSUES: {issues}"]
+    )
+    review = parse_review(response)
+    assert review.verdict == actual.lower()
+    assert review.back_english == back
+    assert review.issues == issues
+    assert review.raw == response
 
 
 def test_translator_passes_both_statements_to_client() -> None:

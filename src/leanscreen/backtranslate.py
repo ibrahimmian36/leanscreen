@@ -133,7 +133,7 @@ _SYSTEM_PROMPT_CHECKLIST = (
 _BACK_RE = re.compile(
     r"BACK-TRANSLATION:\s*(?P<v>.+?)(?=\n\s*VERDICT:|\Z)", re.DOTALL | re.IGNORECASE
 )
-_VERDICT_RE = re.compile(r"VERDICT:\s*(?P<v>FAITHFUL|MISMATCH|UNCLEAR)", re.IGNORECASE)
+_VERDICT_RE = re.compile(r"^[^\S\r\n]*VERDICT:(?P<v>[^\r\n]*)", re.MULTILINE | re.IGNORECASE)
 _ISSUES_RE = re.compile(r"ISSUES:\s*(?P<v>.+?)\Z", re.DOTALL | re.IGNORECASE)
 
 _VALID_VERDICTS = {"faithful", "mismatch", "unclear"}
@@ -163,12 +163,13 @@ def build_user_prompt(informal: str, lean_code: str) -> str:
 
 
 def parse_review(response: str) -> BackReview:
-    """Parse the structured response; degrade gracefully if the format slips."""
+    """Parse LF/CRLF responses; unsupported bare CRs make the verdict unclear."""
     back = _BACK_RE.search(response)
-    verdict = _VERDICT_RE.search(response)
+    verdicts = {match.group("v").strip().lower() for match in _VERDICT_RE.finditer(response)}
     issues = _ISSUES_RE.search(response)
-    v = verdict.group("v").strip().lower() if verdict else "unclear"
-    if v not in _VALID_VERDICTS:
+    # Missing, malformed or conflicting fields must not silently select a verdict.
+    v = next(iter(verdicts)) if len(verdicts) == 1 and verdicts <= _VALID_VERDICTS else "unclear"
+    if re.search(r"\r(?!\n)", response):
         v = "unclear"
     return BackReview(
         back_english=back.group("v").strip() if back else response.strip(),
